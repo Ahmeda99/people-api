@@ -47,11 +47,10 @@ app.get('/', (req, res) => {
 // Index
 app.get('/people', async (req, res) => {
     try {
-        const people = await People.find({});
-        res.send(people);
+        res.json(await People.find({}));
     } catch (error) {
         console.log('error: ', error);
-        res.send({error: 'something went wrong - check console'});
+        res.json({error: 'something went wrong - check console'});
     }
 });
 
@@ -69,11 +68,10 @@ app.get('/people', (req, res) => {
 // Create
 app.post('/people', async (req, res) => {
     try {
-        const person = await People.create(req.body);
-        res.send(person);
+        res.json(await People.create(req.body));
     } catch (error) {
         console.log('error: ', error);
-        res.send({error: 'something went wrong - check console'});
+        res.json({error: 'something went wrong - check console'});
     }
 });
 
