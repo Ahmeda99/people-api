@@ -1,6 +1,8 @@
 // Dependencies
 const express = require('express');
 const mongoose = require('mongoose');
+const morgan = require('morgan');
+const cors = require('cors');
 // Initialize the Express App
 const app = express();
 
@@ -17,12 +19,69 @@ mongoose.connection
 .on('connected', () => console.log('Connected to MongoDB'))
 .on('error', (err) => console.log('Error with MongoDB: ' + err.message))
 
+
+// Set up our model
+const peopleSchema = new mongoose.Schema({
+    name: String,
+    image: String,
+    title: String
+}, { timestamps: true });
+
+const People = mongoose.model('People', peopleSchema);
+
 // Mount Middleware
+app.use(cors()); // Access-Control-Allow: '*'
+app.use(morgan('dev'));
+app.use(express.json());  
+// 👆 this creates req.body from incoming JSON request bodies
+
+// app.use(express.urlencoded({ extended: false })) 
+// this also creates req.body but 👆 only when express is serving HTML
+
 
 // Mount Routes
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send('Hello and welcome to the people app');
 });
+
+// Index
+app.get('/people', async (req, res) => {
+    try {
+        const people = await People.find({});
+        res.send(people);
+    } catch (error) {
+        console.log('error: ', error);
+        res.send({error: 'something went wrong - check console'});
+    }
+});
+
+// non async await version
+/*
+app.get('/people', (req, res) => {
+    People.find({}, (err, people) => {
+        Blog.find({people: people[0]}, (err, blogs) => {
+            res.send({people, blogs});
+        })
+    });
+});
+
+*/
+// Create
+app.post('/people', async (req, res) => {
+    try {
+        const person = await People.create(req.body);
+        res.send(person);
+    } catch (error) {
+        console.log('error: ', error);
+        res.send({error: 'something went wrong - check console'});
+    }
+});
+
+// Update
+
+// Delete
+
+
 
 // Tell Express to Listen
 app.listen(PORT, () => {
